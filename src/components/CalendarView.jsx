@@ -1,25 +1,31 @@
 import React from "react";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { format } from "date-fns";
 
-const CalendarView = ({ onDateChange, tasks }) => {
-  // Function to add custom content to calendar tiles
-  const tileContent = ({ date }) => {
-    // Check if there are tasks for this date
-    const taskForDate = tasks.find(
-      (task) => new Date(task.deadline).toDateString() === date.toDateString()
-    );
-    return taskForDate ? (
-      <div className="calendar-task">
-        • {taskForDate.taskName}
-      </div>
-    ) : null;
+const CalendarView = ({ tasks }) => {
+  const getTileClass = ({ date }) => {
+    const formattedDate = format(date, "MM-dd-yyyy");
+    const task = tasks.find((t) => t.deadline === formattedDate);
+
+    if (task) {
+      switch (task.priority) {
+        case "High":
+          return "calendar-high-priority";
+        case "Medium":
+          return "calendar-medium-priority";
+        case "Low":
+          return "calendar-low-priority";
+        default:
+          return "";
+      }
+    }
+    return "";
   };
 
   return (
-    <div className="calendar-view">
-      <Calendar onChange={onDateChange} tileContent={tileContent} />
-    </div>
+    <Calendar
+      tileClassName={getTileClass}
+    />
   );
 };
 
